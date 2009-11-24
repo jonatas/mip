@@ -60,7 +60,11 @@ dimensiona_risco = lambda do |matriz_risco|
   matriz_risco.each do |risco_probabilidade, pesos|
     pesos.each do |peso, dimensoes|
       dimensoes.each do |dimensao| 
-        fator = risco_probabilidade == :probabilidade ? :peso : :peso_tempo_custo_qualidade
+        fator = 
+          case risco_probabilidade 
+            when :probabilidade then :peso 
+            when :impacto then :peso_tempo_custo_qualidade
+          end
         (resultado[dimensao]||={})[risco_probabilidade] = fatores_de_escala[peso][fator]
       end
     end
@@ -84,15 +88,19 @@ matriz_risco = {
 requisitos = [
 {
   :probabilidade => {
-    :med => %w(P C),
+    :bx => %w(P C),
     :alt => %w(Q L),
     :malt => %w($ T)
   },
   :impacto => {
-    :malt => %w(P C $ T),
+    :bx => %w(P C),
+    :malt => %w($ T),
     :alt => %w(Q L)
   }
-},{
+}
+]
+=begin
+,{
   :probabilidade => {
     :mbx => %w(C P),
     :alt => %w($ T),
@@ -136,7 +144,7 @@ requisitos = [
     :med => %w(P C)
   }
 }
-]
+=end
 
 ordem_de_prioridade = {}
 requisitos.each_with_index do |matriz_risco, i|
